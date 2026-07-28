@@ -1,18 +1,59 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoPessoa {
+  FISICA
+  JURIDICA
+
+  @@map("tipo_pessoa")
 }
 
 model Empresa {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  cnpj        String   @unique
-  email       String   @unique
-  telefone    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  nome       String
+  cnpj       String   @unique
+  email      String   @unique
+  telefone   String?
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("empresas")
+}
+
+model Cliente {
+  id                    Int         @id @default(autoincrement())
+  nome                  String
+
+  tipoPessoa            TipoPessoa  @default(FISICA) @map("tipo_pessoa")
+
+  cpfCnpj               String?     @unique @map("cpf_cnpj")
+  rgInscricaoEstadual   String?     @map("rg_inscricao_estadual")
+
+  celular               String
+  telefone              String?
+  email                 String?     @unique
+
+  cep                   String?
+  logradouro            String?
+  numero                String?
+  complemento           String?
+  bairro                String?
+  cidade                String?
+  estado                String?
+
+  observacoes           String?
+
+  ativo                 Boolean     @default(true)
+
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+
+  @@map("clientes")
 }

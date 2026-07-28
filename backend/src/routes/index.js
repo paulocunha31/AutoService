@@ -1,5 +1,7 @@
 import { Router } from 'express';
 
+import clienteRoutes from '../modules/cliente/index.js';
+
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -9,5 +11,7 @@ router.get('/', (req, res) => {
     status: 'online',
   });
 });
+
+router.use('/clientes', clienteRoutes);
 
 export default router;

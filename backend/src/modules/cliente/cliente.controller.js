@@ -1,7 +1,7 @@
 import { success } from '../../helpers/response.js';
+import { createClienteSchema } from '../../validators/cliente.validator.js';
 import { idParamSchema } from '../../validators/id.validator.js';
 import clienteService from './cliente.service.js';
-import { createClienteSchema } from './cliente.validator.js';
 
 class ClienteController {
   async create(req, res, next) {

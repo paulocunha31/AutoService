@@ -15,45 +15,151 @@ enum TipoPessoa {
 }
 
 model Empresa {
-  id         Int      @id @default(autoincrement())
-  nome       String
-  cnpj       String   @unique
-  email      String   @unique
-  telefone   String?
+  id       Int     @id @default(autoincrement())
+  nome     String
+  cnpj     String  @unique
+  email    String  @unique
+  telefone String?
 
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("empresas")
 }
 
 model Cliente {
-  id                    Int         @id @default(autoincrement())
-  nome                  String
+  id   Int    @id @default(autoincrement())
+  nome String
 
-  tipoPessoa            TipoPessoa  @default(FISICA) @map("tipo_pessoa")
+  tipoPessoa TipoPessoa @default(FISICA) @map("tipo_pessoa")
 
-  cpfCnpj               String?     @unique @map("cpf_cnpj")
-  rgInscricaoEstadual   String?     @map("rg_inscricao_estadual")
+  cpfCnpj             String? @unique @map("cpf_cnpj")
+  rgInscricaoEstadual String? @map("rg_inscricao_estadual")
 
-  celular               String
-  telefone              String?
-  email                 String?     @unique
+  celular  String
+  telefone String?
+  email    String? @unique
 
-  cep                   String?
-  logradouro            String?
-  numero                String?
-  complemento           String?
-  bairro                String?
-  cidade                String?
-  estado                String?
+  cep         String?
+  logradouro  String?
+  numero      String?
+  complemento String?
+  bairro      String?
+  cidade      String?
+  estado      String?
 
-  observacoes           String?
+  observacoes String?
 
-  ativo                 Boolean     @default(true)
+  ativo Boolean @default(true)
 
-  createdAt             DateTime    @default(now()) @map("created_at")
-  updatedAt             DateTime    @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  veiculos     Veiculo[]
+  agendamentos Agendamento[]
 
   @@map("clientes")
+}
+
+model Veiculo {
+  id Int @id @default(autoincrement())
+
+  placa         String  @unique
+  marca         String
+  modelo        String
+  ano           Int
+  cor           String?
+  combustivel   String?
+  quilometragem Int?
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  ativo Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  agendamentos Agendamento[]
+
+  @@map("veiculos")
+}
+
+enum StatusAgendamento {
+  AGENDADO
+  CONFIRMADO
+  EM_ATENDIMENTO
+  CONCLUIDO
+  CANCELADO
+
+  @@map("status_agendamento")
+}
+
+model Agendamento {
+  id Int @id @default(autoincrement())
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  veiculoId Int
+  veiculo   Veiculo @relation(fields: [veiculoId], references: [id])
+
+  data        DateTime
+  servico     String
+  observacoes String?
+
+  status StatusAgendamento @default(AGENDADO)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("agendamentos")
+}
+
+model Categoria {
+  id        Int     @id @default(autoincrement())
+  nome      String  @unique
+  descricao String?
+  ativo     Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  servicos Servico[]
+  produtos Produto[]
+
+  @@map("categorias")
+}
+
+model Servico {
+  id        Int     @id @default(autoincrement())
+  nome      String
+  descricao String?
+  preco     Decimal @db.Decimal(10, 2)
+  ativo     Boolean @default(true)
+
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("servicos")
+}
+
+model Produto {
+  id        Int     @id @default(autoincrement())
+  nome      String
+  descricao String?
+  preco     Decimal @db.Decimal(10, 2)
+  estoque   Int     @default(0)
+  ativo     Boolean @default(true)
+
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("produtos")
 }

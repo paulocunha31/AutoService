@@ -21,6 +21,10 @@ const options = {
         name: 'Clientes',
         description: 'Gerenciamento de clientes',
       },
+      {
+        name: 'Veículos',
+        description: 'Gerenciamento de veículos',
+      },
     ],
 
     components: {
@@ -56,6 +60,95 @@ const options = {
             email: {
               type: 'string',
               example: 'paulo@email.com',
+            },
+            ativo: {
+              type: 'boolean',
+              example: true,
+            },
+          },
+        },
+        Veiculo: {
+          type: 'object',
+          required: ['placa', 'marca', 'modelo', 'ano', 'clienteId'],
+          properties: {
+            id: {
+              type: 'integer',
+              example: 1,
+            },
+
+            placa: {
+              type: 'string',
+              example: 'ABC1D23',
+            },
+
+            marca: {
+              type: 'string',
+              example: 'Toyota',
+            },
+
+            modelo: {
+              type: 'string',
+              example: 'Corolla',
+            },
+
+            ano: {
+              type: 'integer',
+              example: 2022,
+            },
+
+            cor: {
+              type: 'string',
+              nullable: true,
+              example: 'Prata',
+            },
+
+            combustivel: {
+              type: 'string',
+              nullable: true,
+              example: 'Flex',
+            },
+
+            quilometragem: {
+              type: 'integer',
+              nullable: true,
+              example: 45000,
+            },
+
+            clienteId: {
+              type: 'integer',
+              example: 1,
+            },
+
+            ativo: {
+              type: 'boolean',
+              example: true,
+            },
+
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        Categoria: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'integer',
+              example: 1,
+            },
+            nome: {
+              type: 'string',
+              example: 'Ar-condicionado',
+            },
+            descricao: {
+              type: 'string',
+              example: 'Serviços de ar-condicionado automotivo',
             },
             ativo: {
               type: 'boolean',

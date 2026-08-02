@@ -156,6 +156,37 @@ const options = {
             },
           },
         },
+        Servico: {
+          type: 'object',
+          required: ['nome', 'preco', 'categoriaId'],
+          properties: {
+            id: {
+              type: 'integer',
+              example: 1,
+            },
+            nome: {
+              type: 'string',
+              example: 'Recarga de gás',
+            },
+            descricao: {
+              type: 'string',
+              example: 'Recarga do sistema de ar-condicionado automotivo',
+            },
+            preco: {
+              type: 'number',
+              format: 'double',
+              example: 150.0,
+            },
+            categoriaId: {
+              type: 'integer',
+              example: 1,
+            },
+            ativo: {
+              type: 'boolean',
+              example: true,
+            },
+          },
+        },
       },
     },
   },

@@ -187,6 +187,63 @@ const options = {
             },
           },
         },
+        Produto: {
+          type: 'object',
+          required: ['nome', 'preco', 'categoriaId'],
+          properties: {
+            id: {
+              type: 'integer',
+              example: 1,
+            },
+
+            nome: {
+              type: 'string',
+              example: 'Filtro de cabine',
+            },
+
+            descricao: {
+              type: 'string',
+              example: 'Filtro de cabine para ar-condicionado automotivo',
+            },
+
+            preco: {
+              type: 'number',
+              format: 'float',
+              example: 89.9,
+            },
+
+            estoque: {
+              type: 'integer',
+              example: 10,
+            },
+
+            fotoUrl: {
+              type: 'string',
+              format: 'uri',
+              example: 'https://exemplo.com/imagens/filtro-cabine.jpg',
+            },
+
+            ativo: {
+              type: 'boolean',
+              example: true,
+            },
+
+            categoriaId: {
+              type: 'integer',
+              example: 1,
+            },
+
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
       },
     },
   },

@@ -153,6 +153,7 @@ model Produto {
   descricao String?
   preco     Decimal @db.Decimal(10, 2)
   estoque   Int     @default(0)
+  fotoUrl   String? @map("foto_url")
   ativo     Boolean @default(true)
 
   categoriaId Int

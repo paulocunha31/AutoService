@@ -1,8 +1,9 @@
 import { Router } from 'express';
 
-import categoriaRoutes from '../modules/categoria/categoria.routes.js';
+import categoriaRoutes from '../modules/categoria/index.js';
 import clienteRoutes from '../modules/cliente/index.js';
-import servicoRoutes from '../modules/servico/servico.routes.js';
+import produtoRoutes from '../modules/produto/index.js';
+import servicoRoutes from '../modules/servico/index.js';
 import veiculoRoutes from '../modules/veiculo/index.js';
 
 const router = Router();
@@ -19,5 +20,6 @@ router.use('/clientes', clienteRoutes);
 router.use('/veiculos', veiculoRoutes);
 router.use('/categorias', categoriaRoutes);
 router.use('/servicos', servicoRoutes);
+router.use('/produtos', produtoRoutes);
 
 export default router;

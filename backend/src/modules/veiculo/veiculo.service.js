@@ -40,6 +40,14 @@ class VeiculoService {
   async update(id, data) {
     const veiculo = await this.findById(id);
 
+    if (data.clienteId && data.clienteId !== veiculo.clienteId) {
+      const cliente = await clienteRepository.findById(data.clienteId);
+
+      if (!cliente || !cliente.ativo) {
+        throw new AppError('Cliente não encontrado.', 404);
+      }
+    }
+
     if (data.placa && data.placa !== veiculo.placa) {
       const placaExistente = await veiculoRepository.findByPlaca(data.placa);
 
@@ -47,6 +55,7 @@ class VeiculoService {
         throw new AppError('Placa já cadastrada.', 409);
       }
     }
+
     return veiculoRepository.update(id, data);
   }
 

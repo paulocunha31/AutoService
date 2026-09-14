@@ -1,5 +1,5 @@
 import { success } from '../../helpers/response.js';
-import { createClienteSchema } from '../../validators/cliente.validator.js';
+import { createClienteSchema, updateClienteSchema } from '../../validators/cliente.validator.js';
 import { idParamSchema } from '../../validators/id.validator.js';
 import clienteService from './cliente.service.js';
 
@@ -42,7 +42,7 @@ class ClienteController {
     try {
       const { id } = idParamSchema.parse(req.params);
 
-      const data = createClienteSchema.parse(req.body);
+      const data = updateClienteSchema.parse(req.body);
 
       const cliente = await clienteService.update(id, data);
 

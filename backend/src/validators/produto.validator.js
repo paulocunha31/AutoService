@@ -13,7 +13,10 @@ export const createProdutoSchema = z.object({
     .min(0, 'O estoque não pode ser negativo.')
     .default(0),
 
-  fotoUrl: z.string().trim().url('A URL da foto é inválida.').optional(),
+  fotoUrl: z.preprocess(
+    (value) => (typeof value === 'string' ? value.trim() : value),
+    z.url('A URL da foto é inválida.').optional(),
+  ),
 
   categoriaId: z
     .number()
@@ -34,7 +37,10 @@ export const updateProdutoSchema = z.object({
     .min(0, 'O estoque não pode ser negativo.')
     .optional(),
 
-  fotoUrl: z.string().trim().url('A URL da foto é inválida.').optional(),
+  fotoUrl: z.preprocess(
+    (value) => (typeof value === 'string' ? value.trim() : value),
+    z.url('A URL da foto é inválida.').optional(),
+  ),
 
   categoriaId: z
     .number()

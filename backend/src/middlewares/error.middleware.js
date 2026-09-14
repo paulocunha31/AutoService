@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+
 import AppError from '../errors/AppError.js';
 
 export default function errorMiddleware(err, req, res, next) {
@@ -15,7 +16,7 @@ export default function errorMiddleware(err, req, res, next) {
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
-      seccess: false,
+      success: false,
       message: err.message,
     });
   }
@@ -26,5 +27,4 @@ export default function errorMiddleware(err, req, res, next) {
     success: false,
     message: 'Erro interno do servidor.',
   });
-  s;
 }

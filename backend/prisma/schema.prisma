@@ -104,8 +104,10 @@ model Agendamento {
   veiculoId Int
   veiculo   Veiculo @relation(fields: [veiculoId], references: [id])
 
+  servicoId Int
+  servico   Servico @relation(fields: [servicoId], references: [id])
+
   data        DateTime
-  servico     String
   observacoes String?
 
   status StatusAgendamento @default(AGENDADO)
@@ -140,6 +142,8 @@ model Servico {
 
   categoriaId Int
   categoria   Categoria @relation(fields: [categoriaId], references: [id])
+
+  agendamentos Agendamento[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

@@ -13,7 +13,7 @@ class ServicoService {
     const servicoExistente = await servicoRepository.findByNome(data.nome);
 
     if (servicoExistente) {
-      throw new AppError('Servico já cadastrado.', 409);
+      throw new AppError('Serviço já cadastrado.', 409);
     }
 
     const servico = await servicoRepository.create(data);
@@ -29,7 +29,7 @@ class ServicoService {
     const servico = await servicoRepository.findById(id);
 
     if (!servico || !servico.ativo) {
-      throw new AppError('Servico não encontrado.', 404);
+      throw new AppError('Serviço não encontrado.', 404);
     }
 
     return servico;

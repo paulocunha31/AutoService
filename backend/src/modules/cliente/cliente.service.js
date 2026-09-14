@@ -35,6 +35,14 @@ class ClienteService {
   async update(id, data) {
     await this.findById(id);
 
+    if (data.cpfCnpj) {
+      const clienteExistente = await clienteRepository.findByCpfCnpj(data.cpfCnpj);
+
+      if (clienteExistente && clienteExistente.id !== id) {
+        throw new AppError('CPF/CNPJ já cadastrado.', 409);
+      }
+    }
+
     const cliente = await clienteRepository.update(id, data);
 
     return cliente;

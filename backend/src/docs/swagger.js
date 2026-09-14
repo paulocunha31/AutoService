@@ -25,6 +25,23 @@ const options = {
         name: 'Veículos',
         description: 'Gerenciamento de veículos',
       },
+
+      {
+        name: 'Categorias',
+        description: 'Gerenciamento de categorias',
+      },
+      {
+        name: 'Serviços',
+        description: 'Gerenciamento de serviços',
+      },
+      {
+        name: 'Produtos',
+        description: 'Gerenciamento de produtos',
+      },
+      {
+        name: 'Agendamentos',
+        description: 'Gerenciamento de agendamentos',
+      },
     ],
 
     components: {
@@ -231,6 +248,59 @@ const options = {
             categoriaId: {
               type: 'integer',
               example: 1,
+            },
+
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        Agendamento: {
+          type: 'object',
+          required: ['clienteId', 'veiculoId', 'servicoId', 'data'],
+          properties: {
+            id: {
+              type: 'integer',
+              example: 1,
+            },
+
+            clienteId: {
+              type: 'integer',
+              example: 1,
+            },
+
+            veiculoId: {
+              type: 'integer',
+              example: 1,
+            },
+
+            servicoId: {
+              type: 'integer',
+              example: 1,
+            },
+
+            data: {
+              type: 'string',
+              format: 'date-time',
+              example: '2026-09-15T14:00:00',
+            },
+
+            observacoes: {
+              type: 'string',
+              nullable: true,
+              example: 'Verificar o ar-condicionado',
+            },
+
+            status: {
+              type: 'string',
+              enum: ['AGENDADO', 'CONFIRMADO', 'EM_ATENDIMENTO', 'CONCLUIDO', 'CANCELADO'],
+              example: 'AGENDADO',
             },
 
             createdAt: {

@@ -1,6 +1,6 @@
 import { success } from '../../helpers/response.js';
 import { idParamSchema } from '../../validators/id.validator.js';
-import { createVeiculoSchema } from '../../validators/veiculo.validator.js';
+import { createVeiculoSchema, updateVeiculoSchema } from '../../validators/veiculo.validator.js';
 import veiculoService from './veiculo.service.js';
 
 class VeiculoController {
@@ -42,7 +42,9 @@ class VeiculoController {
     try {
       const { id } = idParamSchema.parse(req.params);
 
-      const veiculo = await veiculoService.update(id, req.body);
+      const data = updateVeiculoSchema.parse(req.body);
+
+      const veiculo = await veiculoService.update(id, data);
 
       return success(res, veiculo);
     } catch (error) {

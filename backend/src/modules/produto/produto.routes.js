@@ -1,8 +1,11 @@
 import { Router } from 'express';
 
+import authMiddleware from '../../middlewares/auth.middleware.js';
 import ProdutoController from './produto.controller.js';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -11,6 +14,8 @@ const router = Router();
  *     summary: Cadastra um novo produto
  *     tags:
  *       - Produtos
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,6 +25,8 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Produto cadastrado com sucesso
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Categoria não encontrada
  *       409:
@@ -34,9 +41,13 @@ router.post('/', ProdutoController.create);
  *     summary: Lista todos os produtos
  *     tags:
  *       - Produtos
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de produtos
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  */
 router.get('/', ProdutoController.findAll);
 
@@ -47,6 +58,8 @@ router.get('/', ProdutoController.findAll);
  *     summary: Busca um produto pelo ID
  *     tags:
  *       - Produtos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -56,6 +69,8 @@ router.get('/', ProdutoController.findAll);
  *     responses:
  *       200:
  *         description: Produto encontrado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Produto não encontrado
  */
@@ -68,6 +83,8 @@ router.get('/:id', ProdutoController.findById);
  *     summary: Atualiza um produto
  *     tags:
  *       - Produtos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -83,6 +100,8 @@ router.get('/:id', ProdutoController.findById);
  *     responses:
  *       200:
  *         description: Produto atualizado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Produto não encontrado
  *       409:
@@ -97,6 +116,8 @@ router.put('/:id', ProdutoController.update);
  *     summary: Desativa um produto
  *     tags:
  *       - Produtos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -106,6 +127,8 @@ router.put('/:id', ProdutoController.update);
  *     responses:
  *       200:
  *         description: Produto desativado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Produto não encontrado
  */

@@ -168,3 +168,16 @@ model Produto {
 
   @@map("produtos")
 }
+
+model Usuario {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  email       String    @unique
+  senha       String
+  ativo       Boolean   @default(true)
+
+  createdAt   DateTime  @default(now())  @map("created_at")
+  updatedAt   DateTime  @updatedAt  @map("updated_at")
+
+  @@map("usuarios")
+}

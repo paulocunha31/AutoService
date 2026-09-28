@@ -1,8 +1,11 @@
 import { Router } from 'express';
 
+import authMiddleware from '../../middlewares/auth.middleware.js';
 import VeiculoController from './veiculo.controller.js';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -11,6 +14,8 @@ const router = Router();
  *     summary: Cadastra um novo veículo
  *     tags:
  *       - Veículos
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,6 +25,8 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Veículo cadastrado com sucesso
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Cliente não encontrado
  *       409:
@@ -34,9 +41,13 @@ router.post('/', VeiculoController.create);
  *     summary: Lista todos os veículos ativos
  *     tags:
  *       - Veículos
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de veículos
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  */
 router.get('/', VeiculoController.findAll);
 
@@ -47,6 +58,8 @@ router.get('/', VeiculoController.findAll);
  *     summary: Busca um veículo pelo ID
  *     tags:
  *       - Veículos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -56,6 +69,8 @@ router.get('/', VeiculoController.findAll);
  *     responses:
  *       200:
  *         description: Veículo encontrado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Veículo não encontrado
  */
@@ -68,6 +83,8 @@ router.get('/:id', VeiculoController.findById);
  *     summary: Atualiza um veículo
  *     tags:
  *       - Veículos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -83,6 +100,8 @@ router.get('/:id', VeiculoController.findById);
  *     responses:
  *       200:
  *         description: Veículo atualizado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Veículo não encontrado
  */
@@ -95,6 +114,8 @@ router.put('/:id', VeiculoController.update);
  *     summary: Desativa um veículo
  *     tags:
  *       - Veículos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -104,6 +125,8 @@ router.put('/:id', VeiculoController.update);
  *     responses:
  *       200:
  *         description: Veículo desativado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Veículo não encontrado
  */

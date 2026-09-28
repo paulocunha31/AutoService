@@ -1,8 +1,11 @@
 import { Router } from 'express';
 
+import authMiddleware from '../../middlewares/auth.middleware.js';
 import AgendamentoController from './agendamento.controller.js';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -11,6 +14,8 @@ const router = Router();
  *     summary: Cadastra um novo agendamento
  *     tags:
  *       - Agendamentos
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,6 +25,8 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Agendamento cadastrado com sucesso
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       400:
  *         description: Dados inválidos
  *       404:
@@ -34,9 +41,13 @@ router.post('/', AgendamentoController.create);
  *     summary: Lista todos os agendamentos
  *     tags:
  *       - Agendamentos
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de agendamentos
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  */
 router.get('/', AgendamentoController.findAll);
 
@@ -47,6 +58,8 @@ router.get('/', AgendamentoController.findAll);
  *     summary: Busca um agendamento pelo ID
  *     tags:
  *       - Agendamentos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -56,6 +69,8 @@ router.get('/', AgendamentoController.findAll);
  *     responses:
  *       200:
  *         description: Agendamento encontrado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Agendamento não encontrado
  */
@@ -68,6 +83,8 @@ router.get('/:id', AgendamentoController.findById);
  *     summary: Atualiza um agendamento
  *     tags:
  *       - Agendamentos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -83,6 +100,8 @@ router.get('/:id', AgendamentoController.findById);
  *     responses:
  *       200:
  *         description: Agendamento atualizado com sucesso
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Agendamento não encontrado
  */
@@ -95,6 +114,8 @@ router.put('/:id', AgendamentoController.update);
  *     summary: Cancela um agendamento
  *     tags:
  *       - Agendamentos
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -104,6 +125,8 @@ router.put('/:id', AgendamentoController.update);
  *     responses:
  *       200:
  *         description: Agendamento cancelado com sucesso
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Agendamento não encontrado
  */

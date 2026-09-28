@@ -18,6 +18,10 @@ const options = {
 
     tags: [
       {
+        name: 'Auth',
+        description: 'Autenticação de usuários',
+      },
+      {
         name: 'Clientes',
         description: 'Gerenciamento de clientes',
       },
@@ -42,10 +46,37 @@ const options = {
         name: 'Agendamentos',
         description: 'Gerenciamento de agendamentos',
       },
+      {
+        name: 'Usuarios',
+        description: 'Gerenciamento de Usuários',
+      },
     ],
 
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
       schemas: {
+        Login: {
+          type: 'object',
+          required: ['email', 'senha'],
+          properties: {
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'roberto@email.com',
+            },
+            senha: {
+              type: 'string',
+              format: 'password',
+              example: '654321',
+            },
+          },
+        },
         Cliente: {
           type: 'object',
           properties: {
@@ -301,6 +332,41 @@ const options = {
               type: 'string',
               enum: ['AGENDADO', 'CONFIRMADO', 'EM_ATENDIMENTO', 'CONCLUIDO', 'CANCELADO'],
               example: 'AGENDADO',
+            },
+
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        Usuario: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'integer',
+              example: 1,
+            },
+
+            nome: {
+              type: 'string',
+              example: 'Paulo Roberto',
+            },
+
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'paulo@email.com',
+            },
+
+            ativo: {
+              type: 'boolean',
+              example: true,
             },
 
             createdAt: {

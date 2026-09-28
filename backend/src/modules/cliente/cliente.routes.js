@@ -1,8 +1,11 @@
 import { Router } from 'express';
 
+import authMiddleware from '../../middlewares/auth.middleware.js';
 import ClienteController from './cliente.controller.js';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -11,6 +14,8 @@ const router = Router();
  *     summary: Cadastra um novo cliente
  *     tags:
  *       - Clientes
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,6 +25,8 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Cliente cadastrado com sucesso
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       409:
  *         description: CPF/CNPJ já cadastrado
  */
@@ -32,9 +39,13 @@ router.post('/', ClienteController.create);
  *     summary: Lista todos os clientes
  *     tags:
  *       - Clientes
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de clientes
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  */
 router.get('/', ClienteController.findAll);
 
@@ -45,6 +56,8 @@ router.get('/', ClienteController.findAll);
  *     summary: Busca um cliente pelo ID
  *     tags:
  *       - Clientes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -54,6 +67,8 @@ router.get('/', ClienteController.findAll);
  *     responses:
  *       200:
  *         description: Cliente encontrado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Cliente não encontrado
  */
@@ -66,6 +81,8 @@ router.get('/:id', ClienteController.findById);
  *     summary: Atualiza um cliente
  *     tags:
  *       - Clientes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -81,6 +98,8 @@ router.get('/:id', ClienteController.findById);
  *     responses:
  *       200:
  *         description: Cliente atualizado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  */
 router.put('/:id', ClienteController.update);
 
@@ -91,6 +110,8 @@ router.put('/:id', ClienteController.update);
  *     summary: Desativa um cliente
  *     tags:
  *       - Clientes
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -100,6 +121,8 @@ router.put('/:id', ClienteController.update);
  *     responses:
  *       200:
  *         description: Cliente desativado
+ *       401:
+ *         description: Token não informado, inválido ou expirado
  *       404:
  *         description: Cliente não encontrado
  */

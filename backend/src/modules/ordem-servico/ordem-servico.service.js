@@ -181,7 +181,24 @@ class OrdemServicoService {
   }
 
   async updateStatus(id, status) {
-    await this.findById(id);
+    const ordemServico = await this.findById(id);
+
+    const transicoesPermitidas = {
+      ABERTA: ['EM_ANDAMENTO', 'CANCELADA'],
+      EM_ANDAMENTO: ['AGUARDANDO_PECAS', 'FINALIZADA', 'CANCELADA'],
+      AGUARDANDO_PECAS: ['EM_ANDAMENTO', 'CANCELADA'],
+      FINALIZADA: [],
+      CANCELADA: [],
+    };
+
+    console.log(transicoesPermitidas);
+
+    if (!transicoesPermitidas[ordemServico.status].includes(status)) {
+      throw new AppError(
+        `Não é possível alterar o status de ${ordemServico.status} para ${status}.`,
+        400,
+      );
+    }
 
     return ordemServicoRepository.updateStatus(id, status);
   }

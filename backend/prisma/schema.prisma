@@ -55,8 +55,9 @@ model Cliente {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  veiculos     Veiculo[]
-  agendamentos Agendamento[]
+  veiculos      Veiculo[]
+  agendamentos  Agendamento[]
+  ordensServico OrdemServico[]
 
   @@map("clientes")
 }
@@ -80,7 +81,8 @@ model Veiculo {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  agendamentos Agendamento[]
+  agendamentos  Agendamento[]
+  ordensServico OrdemServico[]
 
   @@map("veiculos")
 }
@@ -143,7 +145,8 @@ model Servico {
   categoriaId Int
   categoria   Categoria @relation(fields: [categoriaId], references: [id])
 
-  agendamentos Agendamento[]
+  agendamentos         Agendamento[]
+  ordemServicoServicos OrdemServicoServico[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -166,18 +169,95 @@ model Produto {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  ordemServicoProdutos OrdemServicoProduto[]
+
   @@map("produtos")
 }
 
 model Usuario {
-  id          Int       @id @default(autoincrement())
-  nome        String
-  email       String    @unique
-  senha       String
-  ativo       Boolean   @default(true)
+  id    Int     @id @default(autoincrement())
+  nome  String
+  email String  @unique
+  senha String
+  ativo Boolean @default(true)
 
-  createdAt   DateTime  @default(now())  @map("created_at")
-  updatedAt   DateTime  @updatedAt  @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("usuarios")
+}
+
+enum StatusOrdemServico {
+  ABERTA
+  EM_ANDAMENTO
+  AGUARDANDO_PECAS
+  FINALIZADA
+  CANCELADA
+
+  @@map("status_ordem_servico")
+}
+
+model OrdemServico {
+  id Int @id @default(autoincrement())
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  veiculoId Int
+  veiculo   Veiculo @relation(fields: [veiculoId], references: [id])
+
+  dataEntrada         DateTime  @default(now()) @map("data_entrada")
+  dataEntregaPrevista DateTime? @map("data_entrega_prevista")
+  dataEntrega         DateTime? @map("data_entrega")
+
+  problema    String
+  diagnostico String?
+  observacoes String?
+
+  status StatusOrdemServico @default(ABERTA)
+
+  valorMaoObra  Decimal @default(0) @map("valor_mao_obra") @db.Decimal(10, 2)
+  valorProdutos Decimal @default(0) @map("valor_produtos") @db.Decimal(10, 2)
+  desconto      Decimal @default(0) @db.Decimal(10, 2)
+  valorTotal    Decimal @default(0) @map("valor_total") @db.Decimal(10, 2)
+
+  servicos OrdemServicoServico[]
+  produtos OrdemServicoProduto[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("ordens_servico")
+}
+
+model OrdemServicoServico {
+  id Int @id @default(autoincrement())
+
+  ordemServicoId Int
+  ordemServico   OrdemServico @relation(fields: [ordemServicoId], references: [id])
+
+  servicoId Int
+  servico   Servico @relation(fields: [servicoId], references: [id])
+
+  quantidade    Int
+  precoUnitario Decimal @map("preco_unitario") @db.Decimal(10, 2)
+  subtotal      Decimal @db.Decimal(10, 2)
+
+  @@map("ordens_servico_servicos")
+}
+
+model OrdemServicoProduto {
+  id Int @id @default(autoincrement())
+
+  ordemServicoId Int
+  ordemServico   OrdemServico @relation(fields: [ordemServicoId], references: [id])
+
+  produtoId Int
+  produto   Produto @relation(fields: [produtoId], references: [id])
+
+  quantidade    Int
+  precoUnitario Decimal @map("preco_unitario") @db.Decimal(10, 2)
+  subtotal      Decimal @db.Decimal(10, 2)
+
+  @@map("ordens_servico_produtos")
 }

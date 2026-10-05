@@ -34,7 +34,7 @@ export const updateClienteSchema = z.object({
 
   rgInscricaoEstadual: z.string().nullish(),
 
-  celular: z.string().trim().min(10, 'Celular inválido.'),
+  celular: z.string().trim().min(10, 'Celular inválido.').optional(),
 
   telefone: z.string().nullish(),
 

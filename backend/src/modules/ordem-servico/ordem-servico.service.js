@@ -191,8 +191,6 @@ class OrdemServicoService {
       CANCELADA: [],
     };
 
-    console.log(transicoesPermitidas);
-
     if (!transicoesPermitidas[ordemServico.status].includes(status)) {
       throw new AppError(
         `Não é possível alterar o status de ${ordemServico.status} para ${status}.`,
@@ -200,7 +198,15 @@ class OrdemServicoService {
       );
     }
 
-    return ordemServicoRepository.updateStatus(id, status);
+    const data = {
+      status,
+    };
+
+    if (status === 'FINALIZADA') {
+      data.dataEntrega = new Date();
+    }
+
+    return ordemServicoRepository.updateStatus(id, data);
   }
 }
 

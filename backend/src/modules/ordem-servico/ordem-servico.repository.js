@@ -19,8 +19,8 @@ class OrdemServicoRepository {
     });
   }
 
-  async findById(id) {
-    return prisma.ordemServico.findUnique({
+  async findById(id, client = prisma) {
+    return client.ordemServico.findUnique({
       where: {
         id,
       },
@@ -41,32 +41,32 @@ class OrdemServicoRepository {
     });
   }
 
-  async addServico(data) {
-    return prisma.ordemServicoServico.create({
+  async addServico(data, client = prisma) {
+    return client.ordemServicoServico.create({
       data,
     });
   }
 
-  async addProduto(data) {
-    return prisma.ordemServicoProduto.create({
+  async addProduto(data, client = prisma) {
+    return client.ordemServicoProduto.create({
       data,
     });
   }
 
-  async removeServico(id) {
-    return prisma.ordemServicoServico.delete({
+  async removeServico(id, client = prisma) {
+    return client.ordemServicoServico.delete({
       where: { id },
     });
   }
 
-  async removeProduto(id) {
-    return prisma.ordemServicoProduto.delete({
+  async removeProduto(id, client = prisma) {
+    return client.ordemServicoProduto.delete({
       where: { id },
     });
   }
 
-  async updateValores(id, data) {
-    return prisma.ordemServico.update({
+  async updateValores(id, data, client = prisma) {
+    return client.ordemServico.update({
       where: { id },
       data: {
         valorMaoObra: data.valorMaoObra,
@@ -76,8 +76,8 @@ class OrdemServicoRepository {
     });
   }
 
-  async update(id, data) {
-    return prisma.ordemServico.update({
+  async update(id, data, client = prisma) {
+    return client.ordemServico.update({
       where: {
         id,
       },

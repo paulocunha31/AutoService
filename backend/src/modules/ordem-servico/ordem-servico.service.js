@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 
+import prisma from '../../config/database.js';
 import AppError from '../../errors/AppError.js';
 import clienteRepository from '../cliente/cliente.repository.js';
 import produtoRepository from '../produto/produto.repository.js';
@@ -34,8 +35,8 @@ class OrdemServicoService {
     return ordemServicoRepository.findAll();
   }
 
-  async findById(id) {
-    const ordemServico = await ordemServicoRepository.findById(id);
+  async findById(id, client) {
+    const ordemServico = await ordemServicoRepository.findById(id, client);
 
     if (!ordemServico) {
       throw new AppError('Ordem de serviço não encontrada.', 404);
@@ -44,8 +45,23 @@ class OrdemServicoService {
     return ordemServico;
   }
 
-  async recalcularValores(id) {
-    const ordemServico = await this.findById(id);
+  validarDesconto(desconto, valorBase) {
+    if (desconto !== undefined && new Prisma.Decimal(desconto).gt(valorBase)) {
+      throw new AppError('O desconto não pode ser maior que o valor da ordem de serviço.', 400);
+    }
+  }
+
+  validarOrdemEditavel(ordemServico) {
+    if (['FINALIZADA', 'CANCELADA'].includes(ordemServico.status)) {
+      throw new AppError(
+        'Não é possível alterar uma ordem de serviço finalizada ou cancelada.',
+        400,
+      );
+    }
+  }
+
+  async recalcularValores(id, client) {
+    const ordemServico = await this.findById(id, client);
 
     const valorMaoObra = ordemServico.servicos.reduce(
       (total, item) => total.plus(item.subtotal),
@@ -57,127 +73,146 @@ class OrdemServicoService {
       new Prisma.Decimal(0),
     );
 
-    const valorTotal = valorMaoObra.plus(valorProdutos).minus(ordemServico.desconto);
+    const valorBase = valorMaoObra.plus(valorProdutos);
 
-    return ordemServicoRepository.updateValores(id, {
-      valorMaoObra,
-      valorProdutos,
-      valorTotal,
-    });
+    if (ordemServico.desconto.gt(valorBase)) {
+      throw new AppError('O desconto não pode ser maior que o valor da ordem de serviço.', 400);
+    }
+
+    const valorTotal = valorBase.minus(ordemServico.desconto);
+
+    return ordemServicoRepository.updateValores(
+      id,
+      {
+        valorMaoObra,
+        valorProdutos,
+        valorTotal,
+      },
+      client,
+    );
   }
 
   async update(id, data) {
-    await this.findById(id);
+    return prisma.$transaction(async (tx) => {
+      const ordemServico = await this.findById(id, tx);
+      this.validarOrdemEditavel(ordemServico);
 
-    await ordemServicoRepository.update(id, data);
+      const valorMaoObra = ordemServico.servicos.reduce(
+        (total, item) => total.plus(item.subtotal),
+        new Prisma.Decimal(0),
+      );
 
-    return this.recalcularValores(id);
+      const valorProdutos = ordemServico.produtos.reduce(
+        (total, item) => total.plus(item.subtotal),
+        new Prisma.Decimal(0),
+      );
+
+      const valorBase = valorMaoObra.plus(valorProdutos);
+
+      if (data.desconto !== undefined) {
+        this.validarDesconto(data.desconto, valorBase);
+      }
+
+      await ordemServicoRepository.update(id, data, tx);
+
+      return this.recalcularValores(id, tx);
+    });
   }
 
   async addServico(id, data) {
-    const ordemServico = await this.findById(id);
+    return prisma.$transaction(async (tx) => {
+      const ordemServico = await this.findById(id, tx);
+      this.validarOrdemEditavel(ordemServico);
 
-    if (ordemServico.status === 'FINALIZADA') {
-      throw new AppError(
-        'Não é possível adicionar serviço em uma ordem de serviço finalizada.',
-        400,
+      const servico = await servicoRepository.findById(data.servicoId);
+
+      if (!servico || !servico.ativo) {
+        throw new AppError('Serviço não encontrado.', 404);
+      }
+
+      const precoUnitario = new Prisma.Decimal(servico.preco);
+      const subtotal = precoUnitario.mul(data.quantidade);
+
+      const ordemServicoServico = await ordemServicoRepository.addServico(
+        {
+          ordemServicoId: id,
+          servicoId: data.servicoId,
+          quantidade: data.quantidade,
+          precoUnitario,
+          subtotal,
+        },
+        tx,
       );
-    }
 
-    const servico = await servicoRepository.findById(data.servicoId);
+      await this.recalcularValores(id, tx);
 
-    if (!servico || !servico.ativo) {
-      throw new AppError('Serviço não encontrado.', 404);
-    }
-
-    const precoUnitario = servico.preco;
-    const subtotal = precoUnitario.mul(data.quantidade);
-
-    const ordemServicoServico = await ordemServicoRepository.addServico({
-      ordemServicoId: id,
-      servicoId: data.servicoId,
-      quantidade: data.quantidade,
-      precoUnitario,
-      subtotal,
+      return ordemServicoServico;
     });
-
-    await this.recalcularValores(id);
-
-    return ordemServicoServico;
   }
 
   async addProduto(id, data) {
-    const ordemServico = await this.findById(id);
+    return prisma.$transaction(async (tx) => {
+      const ordemServico = await this.findById(id, tx);
+      this.validarOrdemEditavel(ordemServico);
 
-    if (ordemServico.status === 'FINALIZADA' || ordemServico.status === 'CANCELADA') {
-      throw new AppError(
-        'Não é possível adicionar produtos a uma ordem de serviço finalizada ou cancelada',
-        400,
+      const produto = await produtoRepository.findById(data.produtoId);
+
+      if (!produto || !produto.ativo) {
+        throw new AppError('Produto não encontrado.', 404);
+      }
+
+      const precoUnitario = new Prisma.Decimal(produto.preco);
+      const subtotal = precoUnitario.mul(data.quantidade);
+
+      const ordemServicoProduto = await ordemServicoRepository.addProduto(
+        {
+          ordemServicoId: id,
+          produtoId: data.produtoId,
+          quantidade: data.quantidade,
+          precoUnitario,
+          subtotal,
+        },
+        tx,
       );
-    }
 
-    const produto = await produtoRepository.findById(data.produtoId);
+      await this.recalcularValores(id, tx);
 
-    if (!produto || !produto.ativo) {
-      throw new AppError('Produto não encontrado.', 404);
-    }
-
-    const precoUnitario = produto.preco;
-    const subtotal = precoUnitario.mul(data.quantidade);
-
-    const ordemServicoProduto = await ordemServicoRepository.addProduto({
-      ordemServicoId: id,
-      produtoId: data.produtoId,
-      quantidade: data.quantidade,
-      precoUnitario,
-      subtotal,
+      return ordemServicoProduto;
     });
-
-    await this.recalcularValores(id);
-
-    return ordemServicoProduto;
   }
 
   async removeServico(ordemServicoId, itemId) {
-    const ordemServico = await this.findById(ordemServicoId);
+    return prisma.$transaction(async (tx) => {
+      const ordemServico = await this.findById(ordemServicoId, tx);
+      this.validarOrdemEditavel(ordemServico);
 
-    if (ordemServico.status === 'FINALIZADA' || ordemServico.status === 'CANCELADA') {
-      throw new AppError(
-        'Não é possível remover serviço de uma ordem de serviço finalizada ou cancelada.',
-        400,
-      );
-    }
+      const servico = ordemServico.servicos.find((item) => item.id === itemId);
 
-    const servico = ordemServico.servicos.find((item) => item.id === itemId);
+      if (!servico) {
+        throw new AppError('Serviço não encontrado na ordem de serviço.', 404);
+      }
 
-    if (!servico) {
-      throw new AppError('Serviço não encontrado na ordem de serviço.', 404);
-    }
+      await ordemServicoRepository.removeServico(itemId, tx);
 
-    await ordemServicoRepository.removeServico(itemId);
-
-    return this.recalcularValores(ordemServicoId);
+      return this.recalcularValores(ordemServicoId, tx);
+    });
   }
 
   async removeProduto(ordemServicoId, itemId) {
-    const ordemServico = await this.findById(ordemServicoId);
+    return prisma.$transaction(async (tx) => {
+      const ordemServico = await this.findById(ordemServicoId, tx);
+      this.validarOrdemEditavel(ordemServico);
 
-    if (ordemServico.status === 'FINALIZADA' || ordemServico.status === 'CANCELADA') {
-      throw new AppError(
-        'Não é possível remover produtos de uma ordem de serviço finalizada ou cancelada.',
-        400,
-      );
-    }
+      const produto = ordemServico.produtos.find((item) => item.id === itemId);
 
-    const produto = ordemServico.produtos.find((item) => item.id === itemId);
+      if (!produto) {
+        throw new AppError('Produto não encontrado na ordem de serviço.', 404);
+      }
 
-    if (!produto) {
-      throw new AppError('Produto não encontrado na ordem de serviço.', 404);
-    }
+      await ordemServicoRepository.removeProduto(itemId, tx);
 
-    await ordemServicoRepository.removeProduto(itemId);
-
-    return this.recalcularValores(ordemServicoId);
+      return this.recalcularValores(ordemServicoId, tx);
+    });
   }
 
   async updateStatus(id, status) {

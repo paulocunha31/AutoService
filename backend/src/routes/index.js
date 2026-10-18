@@ -4,6 +4,7 @@ import agendamentoRoutes from '../modules/agendamento/index.js';
 import authRoutes from '../modules/auth/index.js';
 import categoriaRoutes from '../modules/categoria/index.js';
 import clienteRoutes from '../modules/cliente/index.js';
+import orcamentoRoutes from '../modules/orcamento/index.js';
 import ordemServicoRoutes from '../modules/ordem-servico/index.js';
 import produtoRoutes from '../modules/produto/index.js';
 import servicoRoutes from '../modules/servico/index.js';
@@ -29,5 +30,6 @@ router.use('/agendamentos', agendamentoRoutes);
 router.use('/usuarios', usuarioRoutes);
 router.use('/auth', authRoutes);
 router.use('/ordens-servico', ordemServicoRoutes);
+router.use('/orcamentos', orcamentoRoutes);
 
 export default router;

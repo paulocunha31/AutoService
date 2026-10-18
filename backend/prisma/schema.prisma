@@ -58,6 +58,7 @@ model Cliente {
   veiculos      Veiculo[]
   agendamentos  Agendamento[]
   ordensServico OrdemServico[]
+  orcamentos    Orcamento[]
 
   @@map("clientes")
 }
@@ -83,6 +84,7 @@ model Veiculo {
 
   agendamentos  Agendamento[]
   ordensServico OrdemServico[]
+  orcamentos    Orcamento[]
 
   @@map("veiculos")
 }
@@ -147,6 +149,7 @@ model Servico {
 
   agendamentos         Agendamento[]
   ordemServicoServicos OrdemServicoServico[]
+  orcamentosServicos   OrcamentoServico[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -170,6 +173,7 @@ model Produto {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   ordemServicoProdutos OrdemServicoProduto[]
+  orcamentosProdutos   OrcamentoProduto[]
 
   @@map("produtos")
 }
@@ -195,6 +199,43 @@ enum StatusOrdemServico {
   CANCELADA
 
   @@map("status_ordem_servico")
+}
+
+enum StatusOrcamento {
+  PENDENTE
+  APROVADO
+  REJEITADO
+  EXPIRADO
+
+  @@map("status_orcamento")
+}
+
+model Orcamento {
+  id Int @id @default(autoincrement())
+
+  clienteId Int
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  veiculoId Int
+  veiculo   Veiculo @relation(fields: [veiculoId], references: [id])
+
+  validade    DateTime?
+  observacoes String?
+
+  status StatusOrcamento @default(PENDENTE)
+
+  valorMaoObra  Decimal @default(0) @map("valor_mao_obra") @db.Decimal(10, 2)
+  valorProdutos Decimal @default(0) @map("valor_produtos") @db.Decimal(10, 2)
+  desconto      Decimal @default(0) @db.Decimal(10, 2)
+  valorTotal    Decimal @default(0) @map("valor_total") @db.Decimal(10, 2)
+
+  servicos OrcamentoServico[]
+  produtos OrcamentoProduto[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("orcamentos")
 }
 
 model OrdemServico {
@@ -260,4 +301,36 @@ model OrdemServicoProduto {
   subtotal      Decimal @db.Decimal(10, 2)
 
   @@map("ordens_servico_produtos")
+}
+
+model OrcamentoServico {
+  id Int @id @default(autoincrement())
+
+  orcamentoId Int
+  orcamento   Orcamento @relation(fields: [orcamentoId], references: [id])
+
+  servicoId Int
+  servico   Servico @relation(fields: [servicoId], references: [id])
+
+  quantidade    Int
+  precoUnitario Decimal @map("preco_unitario") @db.Decimal(10, 2)
+  subtotal      Decimal @db.Decimal(10, 2)
+
+  @@map("orcamentos_servicos")
+}
+
+model OrcamentoProduto {
+  id Int @id @default(autoincrement())
+
+  orcamentoId Int
+  orcamento   Orcamento @relation(fields: [orcamentoId], references: [id])
+
+  produtoId Int
+  produto   Produto @relation(fields: [produtoId], references: [id])
+
+  quantidade    Int
+  precoUnitario Decimal @map("preco_unitario") @db.Decimal(10, 2)
+  subtotal      Decimal @db.Decimal(10, 2)
+
+  @@map("orcamentos_produtos")
 }

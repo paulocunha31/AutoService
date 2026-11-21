@@ -18,8 +18,8 @@ class ServicoRepository {
     });
   }
 
-  async findById(id) {
-    return prisma.servico.findUnique({
+  async findById(id, client = prisma) {
+    return client.servico.findUnique({
       where: { id },
     });
   }

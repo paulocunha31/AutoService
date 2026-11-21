@@ -16,7 +16,13 @@ export const createOrdemServicoSchema = z.object({
   desconto: z.number().min(0, 'O desconto não pode ser negativo.').default(0),
 });
 
-export const updateOrdemServicoSchema = createOrdemServicoSchema.partial();
+export const updateOrdemServicoSchema = createOrdemServicoSchema
+  .omit({
+    clienteId: true,
+    veiculoId: true,
+  })
+  .partial()
+  .strict();
 
 export const updateStatusOrdemServicoSchema = z.object({
   status: z.enum(['ABERTA', 'EM_ANDAMENTO', 'AGUARDANDO_PECAS', 'FINALIZADA', 'CANCELADA']),

@@ -85,8 +85,8 @@ class OrdemServicoRepository {
     });
   }
 
-  async updateStatus(id, data) {
-    return prisma.ordemServico.update({
+  async updateStatus(id, data, client = prisma) {
+    return client.ordemServico.update({
       where: {
         id,
       },

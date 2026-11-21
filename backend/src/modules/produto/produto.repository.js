@@ -18,10 +18,29 @@ class ProdutoRepository {
     });
   }
 
-  async findById(id) {
-    return prisma.produto.findUnique({
+  async findById(id, client = prisma) {
+    return client.produto.findUnique({
       where: { id },
     });
+  }
+
+  async baixarEstoque(id, quantidade, client = prisma) {
+    const resultado = await client.produto.updateMany({
+      where: {
+        id,
+        ativo: true,
+        estoque: {
+          gte: quantidade,
+        },
+      },
+      data: {
+        estoque: {
+          decrement: quantidade,
+        },
+      },
+    });
+
+    return resultado.count;
   }
 
   async findByNome(nome) {

@@ -5,7 +5,9 @@ import usuarioRepository from './usuario.repository.js';
 
 class UsuarioService {
   formatarUsuario(usuario) {
-    const { senha, ...usuarioSemSenha } = usuario;
+    const usuarioSemSenha = { ...usuario };
+
+    delete usuarioSemSenha.senha;
 
     return usuarioSemSenha;
   }

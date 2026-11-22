@@ -255,7 +255,7 @@ class OrdemServicoService {
     });
   }
 
-  async updateStatus(id, status) {
+  async updateStatus(id, status, usuarioId) {
     return prisma.$transaction(async (tx) => {
       const ordemServico = await this.findById(id, tx);
 
@@ -287,6 +287,17 @@ class OrdemServicoService {
 
       if (status === 'FINALIZADA') {
         for (const item of ordemServico.produtos) {
+          const produto = await produtoRepository.findById(item.produtoId, tx);
+
+          if (!produto || !produto.ativo) {
+            throw new AppError(
+              `Estoque insuficiente ou produto indisponível (ID: ${item.produtoId}).`,
+              400,
+            );
+          }
+
+          const estoqueAnterior = produto.estoque;
+
           const estoqueAtualizado = await produtoRepository.baixarEstoque(
             item.produtoId,
             item.quantidade,
@@ -299,6 +310,19 @@ class OrdemServicoService {
               400,
             );
           }
+
+          await tx.movimentacaoEstoque.create({
+            data: {
+              produtoId: item.produtoId,
+              usuarioId,
+              ordemServicoId: id,
+              tipo: 'SAIDA',
+              quantidade: item.quantidade,
+              estoqueAnterior,
+              estoqueAtual: estoqueAnterior - item.quantidade,
+              observacao: `Consumo de produto na OS #${id}`,
+            },
+          });
         }
       }
 

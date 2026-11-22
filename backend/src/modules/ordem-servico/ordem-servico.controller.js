@@ -62,7 +62,7 @@ class OrdemServicoController {
 
       const { status } = updateStatusOrdemServicoSchema.parse(req.body);
 
-      const ordemServico = await ordemServicoService.updateStatus(id, status);
+      const ordemServico = await ordemServicoService.updateStatus(id, status, req.user.id);
 
       return success(res, ordemServico, 'Status da ordem de serviço atualizado com sucesso.');
     } catch (error) {

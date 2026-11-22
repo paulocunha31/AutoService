@@ -174,6 +174,7 @@ model Produto {
 
   ordemServicoProdutos OrdemServicoProduto[]
   orcamentosProdutos   OrcamentoProduto[]
+  movimentacaoestoque  MovimentacaoEstoque[]
 
   @@map("produtos")
 }
@@ -187,6 +188,8 @@ model Usuario {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  movimentacaoestoque MovimentacaoEstoque[]
 
   @@map("usuarios")
 }
@@ -262,8 +265,9 @@ model OrdemServico {
   desconto      Decimal @default(0) @db.Decimal(10, 2)
   valorTotal    Decimal @default(0) @map("valor_total") @db.Decimal(10, 2)
 
-  servicos OrdemServicoServico[]
-  produtos OrdemServicoProduto[]
+  servicos            OrdemServicoServico[]
+  produtos            OrdemServicoProduto[]
+  movimentacaoestoque MovimentacaoEstoque[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -333,4 +337,40 @@ model OrcamentoProduto {
   subtotal      Decimal @db.Decimal(10, 2)
 
   @@map("orcamentos_produtos")
+}
+
+enum TipoMovimentacaoEstoque {
+  ENTRADA
+  SAIDA
+
+  @@map("tipo_movimentacao_estoque")
+}
+
+model MovimentacaoEstoque {
+  id Int @id @default(autoincrement())
+
+  produtoId Int
+  produto   Produto @relation(fields: [produtoId], references: [id])
+
+  usuarioId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  ordemServicoId Int?          @map("ordem_servico_id")
+  ordemServico   OrdemServico? @relation(fields: [ordemServicoId], references: [id], onDelete: SetNull)
+
+  tipo TipoMovimentacaoEstoque
+
+  quantidade      Int
+  estoqueAnterior Int @map("estoque_anterior")
+  estoqueAtual    Int @map("estoque_atual")
+
+  observacao String
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([produtoId])
+  @@index([usuarioId])
+  @@index([ordemServicoId])
+  @@index([createdAt])
+  @@map("movimentacoes_estoque")
 }

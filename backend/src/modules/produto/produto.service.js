@@ -1,3 +1,4 @@
+import prisma from '../../config/database.js';
 import AppError from '../../errors/AppError.js';
 import categoriaRepository from '../categoria/categoria.repository.js';
 import produtoRepository from './produto.repository.js';
@@ -57,6 +58,46 @@ class ProdutoService {
     const produto = await produtoRepository.update(id, data);
 
     return produto;
+  }
+
+  async adicionarEstoque(id, data, usuarioId) {
+    return prisma.$transaction(async (tx) => {
+      const produto = await produtoRepository.findById(id, tx);
+
+      if (!produto || !produto.ativo) {
+        throw new AppError('Produto não encontrado.', 404);
+      }
+
+      const estoqueAnterior = produto.estoque;
+
+      const resultado = await produtoRepository.adicionarEstoque(id, data.quantidade, tx);
+
+      if (resultado === 0) {
+        throw new AppError('Não foi possível atualizar o estoque.', 400);
+      }
+
+      const estoqueAtual = estoqueAnterior + data.quantidade;
+
+      const movimentacao = await tx.movimentacaoEstoque.create({
+        data: {
+          produtoId: id,
+          usuarioId,
+          tipo: 'ENTRADA',
+          quantidade: data.quantidade,
+          estoqueAnterior,
+          estoqueAtual,
+          observacao: data.observacao,
+        },
+      });
+      return {
+        produtoId: id,
+        nome: produto.nome,
+        estoqueAnterior,
+        quantidadeAdicionada: data.quantidade,
+        estoqueAtual,
+        movimentacao,
+      };
+    });
   }
 
   async deactivate(id) {

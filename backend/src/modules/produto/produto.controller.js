@@ -1,4 +1,5 @@
 import { success } from '../../helpers/response.js';
+import { entradaEstoqueSchema } from '../../validators/entrada-estoque.validator.js';
 import { idParamSchema } from '../../validators/id.validator.js';
 import { createProdutoSchema, updateProdutoSchema } from '../../validators/produto.validator.js';
 import produtoService from './produto.service.js';
@@ -47,6 +48,20 @@ class ProdutoController {
       const produto = await produtoService.update(id, data);
 
       return success(res, produto);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async adicionarEstoque(req, res, next) {
+    try {
+      const { id } = idParamSchema.parse(req.params);
+
+      const data = entradaEstoqueSchema.parse(req.body);
+
+      const movimentacao = await produtoService.adicionarEstoque(id, data, req.user.id);
+
+      return success(res, movimentacao, 'Entrada de estoque registrada com sucesso.');
     } catch (error) {
       next(error);
     }

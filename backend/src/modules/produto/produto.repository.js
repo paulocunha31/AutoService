@@ -43,6 +43,22 @@ class ProdutoRepository {
     return resultado.count;
   }
 
+  async adicionarEstoque(id, quantidade, client = prisma) {
+    const resultado = await client.produto.updateMany({
+      where: {
+        id,
+        ativo: true,
+      },
+      data: {
+        estoque: {
+          increment: quantidade,
+        },
+      },
+    });
+
+    return resultado.count;
+  }
+
   async findByNome(nome) {
     return prisma.produto.findFirst({
       where: { nome },

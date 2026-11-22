@@ -14,7 +14,9 @@ class MovimentacaoEstoqueRepository {
           ? {
               createdAt: {
                 ...(dataInicial && { gte: dataInicial }),
-                ...(dataFinal && { lte: dataFinal }),
+                ...(dataFinal && {
+                  lt: new Date(new Date(dataFinal).setDate(new Date(dataFinal).getDate() + 1)),
+                }),
               },
             }
           : {}),
